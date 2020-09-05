@@ -12,9 +12,12 @@ fn main() -> Result<()>{
     // a struct of the options selected at run time
     let flags = cli_interface::get_options(&cli);
 
+    functions::list_files(&path, &flags)?;
 
+    /*
     println!("{}",path.display());
     println!("Options are: {}", flags.print_options());
+    */
 
     Ok(())
 }

@@ -59,4 +59,15 @@ impl Options{
     pub fn print_options(&self)-> String {
         format!("{} {}",self.list, self.all)
     }
+
+    pub fn get_options(&self) -> Vec<bool>{
+        vec![self.list, self.all]
+
+}
+    pub fn list_files(&self) -> bool{
+        self.list
+    }
+    pub fn all_files(&self) -> bool{
+        self.all
+    }
 }
