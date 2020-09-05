@@ -1,21 +1,20 @@
 mod functions;
 mod cli_interface;
 
-use clap::{Arg, App, ArgMatches};
-use std::path::PathBuf;
-use anyhow::{Result, Context};
+use anyhow::Result;
+
 
 fn main() -> Result<()>{
+    // getting the input from the cli
     let cli = cli_interface::get_arguments();
-    let path = cli_interface::get_directory(cli)?;
+    // gets the directory to scan, fails if cannot read it.
+    let path = cli_interface::get_directory(&cli)?;
+    // a struct of the options selected at run time
+    let flags = cli_interface::get_options(&cli);
+
 
     println!("{}",path.display());
+    println!("Options are: {}", flags.print_options());
 
-
-    // gets current directory or ends if unreadable
-    // checks if an error was returned
-    //let cwd = result;
-    //let match_string = functions::create_pattern(&cwd)?;
-    //functions::list_files(match_string);
     Ok(())
 }

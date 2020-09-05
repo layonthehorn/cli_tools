@@ -12,15 +12,19 @@ pub fn get_arguments() -> ArgMatches<'static> {
             .short("l")
             .long("list")
             .help("Lists files in a vertical style"))
+        .arg(Arg::with_name("Hidden")
+            .short("a")
+            .long("all")
+            .help("Shows hidden files"))
         // optional directory to scan
         .arg(Arg::with_name("Directory")
-            .help("Directory to scan.")
+            .help("Optional directory to scan\nDefaults to current directory")
             // will be index one if it exists
             .index(1)).get_matches()
 
 
 }
-pub fn get_directory(cli_result: ArgMatches) -> Result<PathBuf> {
+pub fn get_directory(cli_result: &ArgMatches) -> Result<PathBuf> {
     let path: PathBuf;
     let directory = cli_result.value_of("Directory").unwrap_or_else(|| { "none" });
     if directory == "none" {
@@ -31,4 +35,28 @@ pub fn get_directory(cli_result: ArgMatches) -> Result<PathBuf> {
         path = temp;
     };
     Ok(path)
+}
+
+pub fn get_options(cli_result: &ArgMatches) -> Options{
+    Options::new(
+        cli_result.is_present("List"),
+        cli_result.is_present("Hidden"))
+}
+
+
+pub struct Options{
+    list: bool,
+    all: bool,
+}
+
+impl Options{
+    fn new(op_list: bool, op_all: bool) -> Options {
+        Options{
+            list: op_list,
+            all: op_all,
+        }
+    }
+    pub fn print_options(&self)-> String {
+        format!("{} {}",self.list, self.all)
+    }
 }

@@ -2,6 +2,10 @@ use std::path::PathBuf;
 use glob::glob;
 use anyhow::{Result, Context};
 
+
+
+
+/*
 pub fn create_pattern(path: &PathBuf) -> Result<String> {
     let match_string = path.join("*");
     let return_string = match_string.to_str().context("Could not convert path to usable expression.")?;
@@ -17,3 +21,4 @@ pub fn list_files(matcher: String) -> Result<()>{
     }
     Ok(())
 }
+*/
