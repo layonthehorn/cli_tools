@@ -51,16 +51,20 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
 // attempts to get metadata if possible
 // otherwise only lists if the path is a file or a directory
 fn get_attributes(file: &PathBuf) -> String {
-    let file_meta_data = file.metadata();
     let file_or_dir = if file.is_dir() {
         'D'
     } else {
         'F'
     };
-    return if file_meta_data.is_ok() {
-        format!("{} {}", file_or_dir, file_meta_data.unwrap().len())
-    } else {
-        format!("")
+    // attempts to get metadata if possible
+    return match file.metadata() {
+        Ok(meta) => {
+            format!("{} {}", file_or_dir, meta.len())
+        },
+        Err(_e) => {
+            format!("{}",file_or_dir)
+        }
+
     };
 
 
@@ -73,6 +77,7 @@ fn get_file_base_name(path: &PathBuf) -> String {
     let base_name = path.file_name().unwrap_or_else(|| {std::ffi::OsStr::new("..")});
     // placeholder until better logic is designed
     let final_base = base_name.to_str();
+    // attempts to get a printable file base name
     return match final_base {
         Some(str) => str.to_string(),
         None => "Error".to_string(),
