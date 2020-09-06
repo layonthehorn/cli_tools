@@ -1,10 +1,9 @@
-mod functions;
 mod cli_interface;
+mod functions;
 
 use anyhow::Result;
 
-
-fn main() -> Result<()>{
+fn main() -> Result<()> {
     // getting the input from the cli
     let cli = cli_interface::get_arguments();
     // gets the directory to scan, fails if cannot read it.
