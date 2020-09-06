@@ -1,8 +1,9 @@
 use anyhow::{Context, Result};
-use glob::glob;
+use glob::{glob, glob_with, MatchOptions};
 use std::path::PathBuf;
 // using Options struct from cli interface
 use crate::cli_interface::Options;
+use std::fs::read_dir;
 
 pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
     // checks to see if file can be open and if not terminates the program with error message
@@ -45,11 +46,18 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
 // otherwise only lists if the path is a file or a directory
 fn get_attributes(file: &PathBuf) -> String {
     let convert_kb = 1000;
+
+    // gets number of files inside directory
+    let number_files = match read_dir(file){
+        Ok(files) => {files.count().to_string()
+        }
+        Err(_e) => {"1".to_string()}
+    };
     let file_or_dir = if file.is_dir() { 'D' } else { 'F' };
     // attempts to get metadata if possible
     match file.metadata() {
         // added spacing to the list print for readability
-        Ok(meta) => format!("{}{:>7},{}", file_or_dir, meta.len()/convert_kb,"KB"),
+        Ok(meta) => format!("{}{:>3}{:>7},{}", file_or_dir,number_files , meta.len()/convert_kb,"KB"),
         Err(_e) => format!("{}", file_or_dir),
     }
 
@@ -81,14 +89,15 @@ fn create_pattern(path: &PathBuf) -> Result<String> {
 
 // ls -l
 fn list_normal_files(matcher: String) -> Result<()> {
-    for entry in glob(&matcher).context("Could not create glob iterator")? {
+    for entry in glob_with(&matcher, MatchOptions{
+        case_sensitive: false,
+        require_literal_separator: false,
+        require_literal_leading_dot: true
+    }).context("Could not create glob iterator")? {
         match entry {
             Ok(path) => {
-                let file_name = get_file_base_name(&path);
                 {
-                    if !file_name.starts_with('.') {
-                        println!("{} {}", get_attributes(&path), get_file_base_name(&path));
-                    }
+                    println!("{} {}", get_attributes(&path), get_file_base_name(&path));
                 }
             }
 
@@ -131,14 +140,16 @@ fn list_hidden_files(matcher: String) -> Result<()> {
 // ls
 fn print_normal_files(matcher: String) -> Result<()> {
     let mut files = String::new();
-    for entry in glob(&matcher).context("Could not create glob iterator")? {
+    for entry in glob_with(&matcher, MatchOptions{
+        case_sensitive: false,
+        require_literal_separator: false,
+        require_literal_leading_dot: true
+    }).context("Could not create glob iterator")? {
         match entry {
             Ok(path) => {
                 let file_name = get_file_base_name(&path);
-                if !file_name.starts_with('.') {
-                    files.push_str(" ");
-                    files.push_str(&file_name);
-                }
+                files.push_str(" ");
+                files.push_str(&file_name);
             }
             Err(_e) => {}
         }
