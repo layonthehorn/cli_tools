@@ -44,10 +44,12 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
 // attempts to get metadata if possible
 // otherwise only lists if the path is a file or a directory
 fn get_attributes(file: &PathBuf) -> String {
+    let convert_kb = 1000;
     let file_or_dir = if file.is_dir() { 'D' } else { 'F' };
     // attempts to get metadata if possible
     match file.metadata() {
-        Ok(meta) => format!("{} {}", file_or_dir, meta.len()),
+        // added spacing to the list print for readability
+        Ok(meta) => format!("{}{:>7},{}", file_or_dir, meta.len()/convert_kb,"KB"),
         Err(_e) => format!("{}", file_or_dir),
     }
 
