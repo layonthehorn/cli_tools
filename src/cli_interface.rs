@@ -56,11 +56,6 @@ impl Options{
             all: op_all,
         }
     }
-    // debug helper
-    /*
-    pub fn print_options(&self)-> String {
-        format!("{} {}",self.list, self.all)
-    }*/
 
     pub fn get_options(&self) -> (bool, bool) {
         (self.list, self.all)

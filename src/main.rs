@@ -14,10 +14,5 @@ fn main() -> Result<()>{
 
     functions::list_files(&path, &flags)?;
 
-    /*
-    println!("{}",path.display());
-    println!("Options are: {}", flags.print_options());
-    */
-
     Ok(())
 }

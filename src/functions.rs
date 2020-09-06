@@ -13,7 +13,7 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
 
     if path.is_file(){
         if flags.list_files(){
-            let attributes = get_attributes(&path).context("Could not gather attributes for printing.")?;
+            let attributes = get_attributes(&path);
             println!("{} {}", attributes, base_name);
         }
         else {
@@ -25,7 +25,7 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
         match flags.get_options(){
             // lists all files
             (true, true) => {
-                list_hidden_files(path)?;
+                list_hidden_files(pattern)?;
             },
             // only lists nonhidden files
             (true, false) => {
@@ -37,7 +37,7 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
             },
             // shows nonhidden files in nonlist format
             (false, false) => {
-                print_files(pattern)?;
+                print_normal_files(pattern)?;
 
             },
 
@@ -48,29 +48,39 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
     Ok(())
 }
 
-fn get_attributes(file: &PathBuf) -> Result<String> {
-    let file_meta_data = file.metadata()?;
-    let file_or_dir;
-    if file.is_dir(){
-        file_or_dir = 'D';
-    } else{
-        file_or_dir = 'F';
-    }
+// attempts to get metadata if possible
+// otherwise only lists if the path is a file or a directory
+fn get_attributes(file: &PathBuf) -> String {
+    let file_meta_data = file.metadata();
+    let file_or_dir = if file.is_dir() {
+        'D'
+    } else {
+        'F'
+    };
+    return if file_meta_data.is_ok() {
+        format!("{} {}", file_or_dir, file_meta_data.unwrap().len())
+    } else {
+        format!("")
+    };
+
 
     // d            subdirs   owner        group         size  date_modded
     // drwxr-xr-x.  2         layonthehorn layonthehorn  4096  Jul 19 13:13
-    Ok(format!("{} {}", file_or_dir, file_meta_data.len()))
 
 }
 
 fn get_file_base_name(path: &PathBuf) -> String {
     let base_name = path.file_name().unwrap_or_else(|| {std::ffi::OsStr::new("..")});
     // placeholder until better logic is designed
-    let final_base = base_name.to_str().unwrap();
-    final_base.to_string()
+    let final_base = base_name.to_str();
+    return match final_base {
+        Some(str) => str.to_string(),
+        None => "Error".to_string(),
+    }
 
 }
 
+// creates the glob pattern
 fn create_pattern(path: &PathBuf) -> Result<String> {
     let match_string = path.join("*");
     let return_string = match_string.to_str().context("Could not convert path to usable expression.")?;
@@ -79,12 +89,12 @@ fn create_pattern(path: &PathBuf) -> Result<String> {
 
 // ls -l
 fn list_normal_files(matcher: String) -> Result<()>{
-    for entry in glob(&matcher).unwrap(){
+    for entry in glob(&matcher).context("Could not create glob iterator")?{
         match entry {
             Ok(path) => {
                 let file_name = get_file_base_name(&path);{
                 if file_name.chars().nth(0) != Some('.'){
-                    println!("{} {}", get_attributes(&path)?, get_file_base_name(&path) );
+                    println!("{} {}", get_attributes(&path), get_file_base_name(&path) );
                 } }
 
                 },
@@ -98,7 +108,7 @@ fn list_normal_files(matcher: String) -> Result<()>{
 // ls -a
 fn print_hidden_files(matcher: String) -> Result<()>{
     let mut files = String::new();
-    for entry in glob(&matcher).unwrap(){
+    for entry in glob(&matcher).context("Could not create glob iterator")?{
         match entry {
             Ok(path) => {
                 let file_name = get_file_base_name(&path);
@@ -108,29 +118,26 @@ fn print_hidden_files(matcher: String) -> Result<()>{
             Err(_e) => {},
         }
     }
-    print!("{}",files);
+    println!("{}",files.trim());
     Ok(())
 }
 
 // ls -al
-fn list_hidden_files(path: &PathBuf) -> Result<()>{
-    for entry in std::fs::read_dir(path)?{
+fn list_hidden_files(matcher: String) -> Result<()>{
+    for entry in glob(&matcher).context("Could not create glob iterator")?{
         match entry {
-            Ok(path) => {
-                println!("{} {}",get_attributes(&path.path())? , get_file_base_name(&path.path()))
+            Ok(path) => println!("{} {}", get_attributes(&path), get_file_base_name(&path) ),
 
-            }
-            Err(_e) => {}
-        }
+            Err(_e) => {},
+        }};
 
-    }
     Ok(())
 }
 
 // ls
-fn print_files(matcher: String) -> Result<()>{
+fn print_normal_files(matcher: String) -> Result<()>{
     let mut files = String::new();
-    for entry in glob(&matcher).unwrap(){
+    for entry in glob(&matcher).context("Could not create glob iterator")?{
         match entry {
             Ok(path) => {
                 let file_name = get_file_base_name(&path);
@@ -142,19 +149,6 @@ fn print_files(matcher: String) -> Result<()>{
             Err(_e) => {},
         }
     }
-    print!("{}",files);
+    println!("{}",files.trim());
     Ok(())
 }
-/*
-match path.to_str(){
-Some(string) => {
-files.push_str(" ");
-files.push_str(string);
-},
-
-None => {
-files.push_str(" ");
-files.push_str("Error")
-}
-}
-*/
