@@ -144,7 +144,7 @@ fn get_attributes(file: &PathBuf) -> String {
                 "{}{:>3} {:>5} {:>5}{:>7},{} {}",
                 file_or_dir,
                 //user_data.file_mode,
-                get_subdirectory_count(&file),
+                get_subdirectory_count(&file).unwrap_or_else(|_| {"Er"}.to_string()),
                 user_data.user_name,  // to be user id
                 user_data.group_name, // to be group id
                 meta.len() / convert_kb,
@@ -169,11 +169,11 @@ struct UserData {
 }
 
 // gets the number of sub directories in a folder
-fn get_subdirectory_count(path: &PathBuf) -> String {
+fn get_subdirectory_count(path: &PathBuf) -> Result<String> {
     // if its a directory return the count of directories inside it
     let count = if path.is_dir() {
         let mut inner_count = 2;
-        for entry in read_dir(path).unwrap() {
+        for entry in read_dir(path)?{
             match entry {
                 Ok(t) => {
                     if t.path().is_dir() {
@@ -188,7 +188,7 @@ fn get_subdirectory_count(path: &PathBuf) -> String {
         // if its a file return one
         1
     };
-    count.to_string()
+    Ok(count.to_string())
 }
 
 fn get_user_metadata(meta: &Metadata) -> UserData {

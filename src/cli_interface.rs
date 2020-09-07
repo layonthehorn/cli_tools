@@ -30,16 +30,16 @@ pub fn get_arguments() -> ArgMatches<'static> {
         .get_matches()
 }
 pub fn get_directory(cli_result: &ArgMatches) -> Result<PathBuf> {
-    let path: PathBuf;
-    let directory = cli_result.value_of("Directory").unwrap_or_else(|| "none");
-    if directory == "none" {
-        path = std::env::current_dir().context("Could not open current directory.")?;
-    } else {
-        let mut temp = PathBuf::new();
-        temp.push(directory);
-        path = temp;
+    let directory = match cli_result.value_of("Directory") {
+        Some(path) => {
+            let mut temp = PathBuf::new();
+            temp.push(path);
+            temp
+        },
+        None => std::env::current_dir().context("Could not open current directory.")?
+
     };
-    Ok(path)
+    Ok(directory)
 }
 
 pub fn get_options(cli_result: &ArgMatches) -> Options {
