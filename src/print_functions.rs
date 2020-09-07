@@ -133,7 +133,7 @@ fn get_file_base_name(path: &PathBuf) -> String {
 // gets the attributes of a file
 fn get_attributes(file: &PathBuf) -> String {
     let convert_kb = 1000;
-    let file_or_dir = if file.is_dir() { 'D' } else { 'F' };
+    let file_or_dir = if file.is_dir() { 'd' } else { '-' };
     // attempts to get metadata if possible
     match file.metadata() {
         // added spacing to the list print for readability
@@ -141,9 +141,9 @@ fn get_attributes(file: &PathBuf) -> String {
             let user_data = get_user_metadata(&meta);
 
             format!(
-                "{}{:>5} {:>10} {:>5}{:>7},{} {}",
+                "{}{} {:>5} {:>10} {:>5}{:>7},{} {}",
                 file_or_dir,
-                //user_data.file_mode,
+                user_data.file_mode,
                 // returns ? if unable to look into directory
                 get_subdirectory_count(&file).unwrap_or_else(|_| {"?".to_string()}),
                 user_data.user_name,  // to be user id
@@ -215,9 +215,30 @@ fn get_user_metadata(meta: &Metadata) -> UserData {
     }
 }
 
-// todo: Creation of decent permissions printing
+// turns unix mode into readable format
 fn create_unix_file_mode(number: u32) -> String {
-    number.to_string()
+    let mut base_8_mode = format!("{:o}", number);
+    let end = base_8_mode.len();
+    let start = base_8_mode.len() - 3;
+    // getting permissions slice
+    base_8_mode = base_8_mode[start..end].to_string();
+    let mut print_value = String::new();
+    for number in base_8_mode.chars(){
+        match number {
+            '0' => &print_value.push_str("---"),
+            '1' => &print_value.push_str("--x"),
+            '2' => &print_value.push_str("-w-"),
+            '3' => &print_value.push_str("-wx"),
+            '4' => &print_value.push_str("r--"),
+            '5' => &print_value.push_str("r-x"),
+            '6' => &print_value.push_str("rw-"),
+            '7' => &print_value.push_str("rwx"),
+            // should never happen but I want to know if it does.
+            _ => unreachable!(),
+        };
+    };
+    print_value
+
 }
 
 // gets last time of modification
