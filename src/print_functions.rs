@@ -141,10 +141,11 @@ fn get_attributes(file: &PathBuf) -> String {
             let user_data = get_user_metadata(&meta);
 
             format!(
-                "{}{:>3} {:>5} {:>5}{:>7},{} {}",
+                "{}{:>5} {:>10} {:>5}{:>7},{} {}",
                 file_or_dir,
                 //user_data.file_mode,
-                get_subdirectory_count(&file).unwrap_or_else(|_| {"Er"}.to_string()),
+                // returns ? if unable to look into directory
+                get_subdirectory_count(&file).unwrap_or_else(|_| {"?".to_string()}),
                 user_data.user_name,  // to be user id
                 user_data.group_name, // to be group id
                 meta.len() / convert_kb,
