@@ -19,7 +19,7 @@ pub fn print_hidden_files(path_list: Vec<PathBuf>) -> Result<()> {
         }
     }
 
-    write!(&mut buffer, "\n")?;
+    writeln!(&mut buffer)?;
     bufwtr.print(&buffer)?;
     Ok(())
 }
@@ -30,7 +30,7 @@ pub fn print_normal_files(path_list: Vec<PathBuf>) -> Result<()> {
     let mut buffer = bufwtr.buffer();
     for path in path_list.iter() {
         let base_name = get_file_base_name(&path);
-        if !base_name.starts_with(".") {
+        if !base_name.starts_with('.') {
             if path.is_dir() {
                 buffer.set_color(ColorSpec::new().set_fg(Some(Color::Blue)))?;
                 write!(&mut buffer, "{}", format!("{} ", base_name))?;
@@ -41,7 +41,7 @@ pub fn print_normal_files(path_list: Vec<PathBuf>) -> Result<()> {
         }
     }
 
-    write!(&mut buffer, "\n")?;
+    writeln!(&mut buffer)?;
     bufwtr.print(&buffer)?;
     Ok(())
 }
@@ -53,16 +53,16 @@ pub fn list_normal_files(path_list: Vec<PathBuf>) -> Result<()> {
     for path in path_list.iter() {
         buffer.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
         let base_name = get_file_base_name(&path);
-        if !base_name.starts_with(".") {
+        if !base_name.starts_with('.') {
             write!(&mut buffer, "{} ", get_attributes(path))?;
             if path.is_dir() {
                 buffer.set_color(ColorSpec::new().set_fg(Some(Color::Blue)))?;
                 write!(&mut buffer, "{}", format!("{} ", base_name))?;
-                write!(&mut buffer, "\n")?;
+                writeln!(&mut buffer)?;
             } else {
                 buffer.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
                 write!(&mut buffer, "{}", format!("{} ", base_name))?;
-                write!(&mut buffer, "\n")?;
+                writeln!(&mut buffer)?;
             }
         }
     }
@@ -82,11 +82,11 @@ pub fn list_hidden_files(path_list: Vec<PathBuf>) -> Result<()> {
         if path.is_dir() {
             buffer.set_color(ColorSpec::new().set_fg(Some(Color::Blue)))?;
             write!(&mut buffer, "{}", format!("{} ", base_name))?;
-            write!(&mut buffer, "\n")?;
+            writeln!(&mut buffer)?;
         } else {
             buffer.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
             write!(&mut buffer, "{}", format!("{} ", base_name))?;
-            write!(&mut buffer, "\n")?;
+            writeln!(&mut buffer)?;
         }
     }
 
