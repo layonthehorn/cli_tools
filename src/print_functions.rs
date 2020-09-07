@@ -1,76 +1,107 @@
-use std::path::PathBuf;
+use anyhow::Result;
 use std::fs::read_dir;
 use std::io::Write;
+use std::path::PathBuf;
 use termcolor::{BufferWriter, Color, ColorChoice, ColorSpec, WriteColor};
-use anyhow::Result;
 
 // prints all files in a single line
-pub fn print_hidden_files(path_list: Vec<PathBuf>) -> Result<()>{
+pub fn print_hidden_files(path_list: Vec<PathBuf>) -> Result<()> {
     let bufwtr = BufferWriter::stdout(ColorChoice::Always);
     let mut buffer = bufwtr.buffer();
-    for path in path_list.iter(){
+    for path in path_list.iter() {
         let base_name = get_file_base_name(&path);
-        if path.is_dir(){
+        if path.is_dir() {
             buffer.set_color(ColorSpec::new().set_fg(Some(Color::Blue)))?;
-            write!(&mut buffer,"{}", format!("{} ",base_name))?;
-
+            write!(&mut buffer, "{}", format!("{} ", base_name))?;
         } else {
             buffer.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
-            write!(&mut buffer,"{}", format!("{} ",base_name))?;
+            write!(&mut buffer, "{}", format!("{} ", base_name))?;
         }
-
-
     }
 
-    write!(&mut buffer,"\n")?;
+    write!(&mut buffer, "\n")?;
     bufwtr.print(&buffer)?;
     Ok(())
-
 }
 
 // prints visible files in a list format
 pub fn print_normal_files(path_list: Vec<PathBuf>) -> Result<()> {
     let bufwtr = BufferWriter::stdout(ColorChoice::Always);
     let mut buffer = bufwtr.buffer();
-    for path in path_list.iter(){
+    for path in path_list.iter() {
         let base_name = get_file_base_name(&path);
-        if !base_name.starts_with("."){
-            if path.is_dir(){
+        if !base_name.starts_with(".") {
+            if path.is_dir() {
                 buffer.set_color(ColorSpec::new().set_fg(Some(Color::Blue)))?;
-                write!(&mut buffer,"{}", format!("{} ",base_name))?;
-
+                write!(&mut buffer, "{}", format!("{} ", base_name))?;
             } else {
                 buffer.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
-                write!(&mut buffer,"{}", format!("{} ",base_name))?;
+                write!(&mut buffer, "{}", format!("{} ", base_name))?;
             }
         }
-
-
     }
 
-    write!(&mut buffer,"\n")?;
+    write!(&mut buffer, "\n")?;
     bufwtr.print(&buffer)?;
     Ok(())
 }
 
 // prints all files in a listing format
-pub fn list_normal_files(path_list: Vec<PathBuf>) -> Result<()>{
+pub fn list_normal_files(path_list: Vec<PathBuf>) -> Result<()> {
+    let bufwtr = BufferWriter::stdout(ColorChoice::Always);
+    let mut buffer = bufwtr.buffer();
+    for path in path_list.iter() {
+        buffer.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
+        let base_name = get_file_base_name(&path);
+        if !base_name.starts_with(".") {
+            write!(&mut buffer, "{} ", get_attributes(path))?;
+            if path.is_dir() {
+                buffer.set_color(ColorSpec::new().set_fg(Some(Color::Blue)))?;
+                write!(&mut buffer, "{}", format!("{} ", base_name))?;
+                write!(&mut buffer, "\n")?;
+            } else {
+                buffer.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
+                write!(&mut buffer, "{}", format!("{} ", base_name))?;
+                write!(&mut buffer, "\n")?;
+            }
+        }
+    }
+
+    bufwtr.print(&buffer)?;
     Ok(())
 }
 
 // prints visible files in a list format
 pub fn list_hidden_files(path_list: Vec<PathBuf>) -> Result<()> {
+    let bufwtr = BufferWriter::stdout(ColorChoice::Always);
+    let mut buffer = bufwtr.buffer();
+    for path in path_list.iter() {
+        buffer.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
+        let base_name = get_file_base_name(&path);
+        write!(&mut buffer, "{} ", get_attributes(path))?;
+        if path.is_dir() {
+            buffer.set_color(ColorSpec::new().set_fg(Some(Color::Blue)))?;
+            write!(&mut buffer, "{}", format!("{} ", base_name))?;
+            write!(&mut buffer, "\n")?;
+        } else {
+            buffer.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
+            write!(&mut buffer, "{}", format!("{} ", base_name))?;
+            write!(&mut buffer, "\n")?;
+        }
+    }
+
+    bufwtr.print(&buffer)?;
     Ok(())
 }
 
 // prints the information about a single file
-pub fn print_single_file(path:&PathBuf) {
-    println!("{}",get_file_base_name(&path));
+pub fn print_single_file(path: &PathBuf) {
+    println!("{}", get_file_base_name(&path));
 }
 
 // lists the information about a single file
 pub fn list_single_file(path: &PathBuf) {
-    println!("{} {}",get_attributes(&path) , get_file_base_name(&path));
+    println!("{} {}", get_attributes(&path), get_file_base_name(&path));
 }
 
 // gets the base name of the file at the end of a path

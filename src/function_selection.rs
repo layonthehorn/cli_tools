@@ -20,13 +20,11 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
         match flags.get_options() {
             // lists all files
             (true, true) => {
-                print_functions::list_hidden_files(path_vec)
-                    .context("Failed to print results.")?;
+                print_functions::list_hidden_files(path_vec).context("Failed to print results.")?;
             }
             // only lists nonhidden files
             (true, false) => {
-                print_functions::list_normal_files(path_vec)
-                    .context("Failed to print results.")?;
+                print_functions::list_normal_files(path_vec).context("Failed to print results.")?;
             }
             // shows all files in nonlist format
             (false, true) => {
@@ -45,55 +43,15 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
 }
 
 // collects all the files in a given directory
-fn collect_dir_contents(path: &PathBuf) -> Vec<PathBuf>{
+fn collect_dir_contents(path: &PathBuf) -> Vec<PathBuf> {
     let mut path_list: Vec<PathBuf> = vec![path.join("..")];
-    for entry in read_dir(path).unwrap(){
-        match entry{
-            Ok(t) =>{
+    for entry in read_dir(path).unwrap() {
+        match entry {
+            Ok(t) => {
                 path_list.push(t.path());
-            },
+            }
             Err(_e) => {}
         }
-
     }
     path_list
 }
-/*
-// ls -l
-fn list_normal_files(matcher: String) -> Result<()> {
-    for entry in glob_with(
-        &matcher,
-        MatchOptions {
-            case_sensitive: false,
-            require_literal_separator: false,
-            require_literal_leading_dot: true,
-        },
-    )
-    .context("Could not create glob iterator")?
-    {
-        match entry {
-            Ok(path) => {
-                println!("{} {}", get_attributes(&path), get_file_base_name(&path));
-            }
-
-            Err(_e) => {}
-        }
-    }
-    Ok(())
-}
-
-
-// ls -al
-fn list_hidden_files(matcher: String) -> Result<()> {
-    for entry in glob(&matcher).context("Could not create glob iterator")? {
-        match entry {
-            Ok(path) => println!("{} {}", get_attributes(&path), get_file_base_name(&path)),
-
-            Err(_e) => {}
-        }
-    }
-
-    Ok(())
-}
-
-*/
