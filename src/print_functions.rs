@@ -5,6 +5,9 @@ use std::path::PathBuf;
 use termcolor::{BufferWriter, Color, ColorChoice, ColorSpec, WriteColor};
 use std::os::unix::fs::MetadataExt;
 use users::{get_user_by_uid, get_group_by_gid};
+use std::env::join_paths;
+use std::time::SystemTime;
+use chrono::prelude::Datelike;
 
 // prints all files in a single line
 pub fn print_hidden_files(path_list: Vec<PathBuf>) -> Result<()> {
@@ -140,14 +143,15 @@ fn get_attributes(file: &PathBuf) -> String {
             let user_data = get_user_metadata(&meta);
 
             format!(
-            "{}{:>3} {:>5} {:>5}{:>7},{}",
+            "{}{:>3} {:>5} {:>5}{:>7},{} {}",
             file_or_dir,
             //user_data.file_mode,
             get_subdirectory_count(&file),
             user_data.user_name, // to be user id
             user_data.group_name, // to be group id
             meta.len() / convert_kb,
-            "KB"
+            "KB",
+            get_last_change(&meta)
         )},
         Err(_e) => format!("{}", file_or_dir),
     }
@@ -218,4 +222,11 @@ fn get_user_metadata(meta: &Metadata) -> UserData {
 // todo: Creation of decent permissions printing
 fn create_unix_file_mode(number: u32) -> String {
    number.to_string()
+}
+// todo: date of last change
+#[allow(dead_code, unused_variables)]
+fn get_last_change(meta: &Metadata) -> String{
+    let last_time = meta.mtime();
+
+    last_time.to_string()
 }
