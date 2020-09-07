@@ -226,6 +226,6 @@ fn create_unix_file_mode(number: u32) -> String {
 // gets last time of modification
 fn get_last_change(meta: &Metadata) -> String{
     let dt = Local.timestamp(meta.mtime(), 0);
-
-    dt.to_rfc2822()
+    let formatted = dt.format("%b %a %e %T");
+    format!("{}", formatted)
 }
