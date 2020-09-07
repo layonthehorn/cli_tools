@@ -1,11 +1,11 @@
 use anyhow::Result;
+use chrono::{Local, TimeZone};
 use std::fs::{read_dir, Metadata};
 use std::io::Write;
+use std::os::unix::fs::MetadataExt;
 use std::path::PathBuf;
 use termcolor::{BufferWriter, Color, ColorChoice, ColorSpec, WriteColor};
-use std::os::unix::fs::MetadataExt;
-use users::{get_user_by_uid, get_group_by_gid};
-use chrono::{TimeZone, Local};
+use users::{get_group_by_gid, get_user_by_uid};
 
 // prints all files in a single line
 pub fn print_hidden_files(path_list: Vec<PathBuf>) -> Result<()> {
@@ -141,16 +141,17 @@ fn get_attributes(file: &PathBuf) -> String {
             let user_data = get_user_metadata(&meta);
 
             format!(
-            "{}{:>3} {:>5} {:>5}{:>7},{} {}",
-            file_or_dir,
-            //user_data.file_mode,
-            get_subdirectory_count(&file),
-            user_data.user_name, // to be user id
-            user_data.group_name, // to be group id
-            meta.len() / convert_kb,
-            "KB",
-            get_last_change(&meta)
-        )},
+                "{}{:>3} {:>5} {:>5}{:>7},{} {}",
+                file_or_dir,
+                //user_data.file_mode,
+                get_subdirectory_count(&file),
+                user_data.user_name,  // to be user id
+                user_data.group_name, // to be group id
+                meta.len() / convert_kb,
+                "KB",
+                get_last_change(&meta)
+            )
+        }
         Err(_e) => format!("{}", file_or_dir),
     }
 
@@ -160,7 +161,7 @@ fn get_attributes(file: &PathBuf) -> String {
 
 // will hold useful user and file data
 #[allow(dead_code)]
-struct UserData{
+struct UserData {
     user_name: String,
     group_name: String,
     // not yet used
@@ -170,12 +171,12 @@ struct UserData{
 // gets the number of sub directories in a folder
 fn get_subdirectory_count(path: &PathBuf) -> String {
     // if its a directory return the count of directories inside it
-    let count = if path.is_dir(){
+    let count = if path.is_dir() {
         let mut inner_count = 2;
         for entry in read_dir(path).unwrap() {
             match entry {
                 Ok(t) => {
-                    if t.path().is_dir(){
+                    if t.path().is_dir() {
                         inner_count += 1;
                     }
                 }
@@ -183,14 +184,11 @@ fn get_subdirectory_count(path: &PathBuf) -> String {
             }
         }
         inner_count
-
     } else {
         // if its a file return one
         1
-
     };
     count.to_string()
-
 }
 
 fn get_user_metadata(meta: &Metadata) -> UserData {
@@ -200,18 +198,16 @@ fn get_user_metadata(meta: &Metadata) -> UserData {
 
     // getting username of file owner
     let user = match &user_id {
-        Some(u) =>{u.name().to_str().unwrap_or_else(|| {"DNE"})}
-        None => {"DNE"}
+        Some(u) => u.name().to_str().unwrap_or_else(|| "DNE"),
+        None => "DNE",
     };
 
     // getting group of file owner
     let group = match &group_id {
-        Some(g)=> { g.name().to_str().unwrap_or_else(||{"DNE"})
-
-        },
-        None => {"DNE"}
+        Some(g) => g.name().to_str().unwrap_or_else(|| "DNE"),
+        None => "DNE",
     };
-    UserData{
+    UserData {
         user_name: user.to_string(),
         group_name: group.to_string(),
         file_mode: create_unix_file_mode(user_mode),
@@ -220,12 +216,18 @@ fn get_user_metadata(meta: &Metadata) -> UserData {
 
 // todo: Creation of decent permissions printing
 fn create_unix_file_mode(number: u32) -> String {
-   number.to_string()
+    number.to_string()
 }
 
 // gets last time of modification
-fn get_last_change(meta: &Metadata) -> String{
+fn get_last_change(meta: &Metadata) -> String {
     let dt = Local.timestamp(meta.mtime(), 0);
-    let formatted = dt.format("%b %a %e %T");
+    /*
+    %b - Abbreviated month name. Always 3 letters.
+    %a - Abbreviated weekday name. Always 3 letters.
+    %e - Day number (01--31), space-padded to 2 digits.
+    %r - Hour-minute-second format in 12-hour clocks.
+    */
+    let formatted = dt.format("%b %a %e %r");
     format!("{}", formatted)
 }

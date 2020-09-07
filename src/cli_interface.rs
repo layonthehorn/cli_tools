@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 pub fn get_arguments() -> ArgMatches<'static> {
     App::new("List Directories")
-        .version("0.1")
+        .version("0.5")
         .author("Layonthehorn")
         .about("Lists directories and files")
         // option for formatting
@@ -12,7 +12,7 @@ pub fn get_arguments() -> ArgMatches<'static> {
             Arg::with_name("List")
                 .short("l")
                 .long("list")
-                .help("Lists files in a vertical style"),
+                .help("Lists files in a vertical style\nAdded extra metadata to print"),
         )
         .arg(
             Arg::with_name("Hidden")
