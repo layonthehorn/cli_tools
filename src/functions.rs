@@ -3,6 +3,7 @@ use glob::{glob, glob_with, MatchOptions};
 use std::path::PathBuf;
 // using Options struct from cli interface
 use crate::cli_interface::Options;
+use crate::print_functions;
 use std::fs::read_dir;
 
 pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
@@ -18,6 +19,7 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
             println!("{}", base_name)
         }
     } else {
+        let path_vec = collect_dir_contents(&path);
         let pattern = create_pattern(path)?;
         match flags.get_options() {
             // lists all files
@@ -34,7 +36,8 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
             }
             // shows nonhidden files in nonlist format
             (false, false) => {
-                print_normal_files(pattern)?;
+                collect_dir_contents(&path);
+                //print_normal_files(pattern)?;
             }
         }
     }
@@ -170,3 +173,18 @@ fn print_normal_files(matcher: String) -> Result<()> {
     println!("{}", files.trim());
     Ok(())
 }
+
+fn collect_dir_contents(path: &PathBuf) -> Vec<PathBuf>{
+    let mut path_list: Vec<PathBuf> = vec![path.join(".."), path.join(".")];
+    for entry in read_dir(path).unwrap(){
+        match entry{
+            Ok(T) =>{
+                path_list.push(T.path());
+                //println!("{}", T.path().display());
+            },
+            Err(_E) => {}
+        }
+
+        }
+    path_list
+    }

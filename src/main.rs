@@ -1,5 +1,6 @@
 mod cli_interface;
 mod functions;
+mod print_functions;
 
 use anyhow::Result;
 
