@@ -1,5 +1,4 @@
 use anyhow::{Context, Result};
-use glob::{glob, glob_with, MatchOptions};
 use std::path::PathBuf;
 // using Options struct from cli interface
 use crate::cli_interface::Options;
@@ -21,23 +20,23 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
         match flags.get_options() {
             // lists all files
             (true, true) => {
-                print_functions::list_hidden_files(path_vec);
-                //list_hidden_files(pattern)?;
+                print_functions::list_hidden_files(path_vec)
+                    .context("Failed to print results.")?;
             }
             // only lists nonhidden files
             (true, false) => {
-                print_functions::list_normal_files(path_vec);
-                //list_normal_files(pattern)?;
+                print_functions::list_normal_files(path_vec)
+                    .context("Failed to print results.")?;
             }
             // shows all files in nonlist format
             (false, true) => {
-                print_functions::print_hidden_files(path_vec);
-                //print_hidden_files(pattern)?;
+                print_functions::print_hidden_files(path_vec)
+                    .context("Failed to print results.")?;
             }
             // shows nonhidden files in nonlist format
             (false, false) => {
-                print_functions::print_normal_files(path_vec);
-                //print_normal_files(pattern)?;
+                print_functions::print_normal_files(path_vec)
+                    .context("Failed to print results.")?;
             }
         }
     }
@@ -50,11 +49,11 @@ fn collect_dir_contents(path: &PathBuf) -> Vec<PathBuf>{
     let mut path_list: Vec<PathBuf> = vec![path.join(".."), path.join(".")];
     for entry in read_dir(path).unwrap(){
         match entry{
-            Ok(T) =>{
-                path_list.push(T.path());
+            Ok(t) =>{
+                path_list.push(t.path());
                 //println!("{}", T.path().display());
             },
-            Err(_E) => {}
+            Err(_e) => {}
         }
 
     }
