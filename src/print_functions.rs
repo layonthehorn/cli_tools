@@ -1,8 +1,10 @@
 use anyhow::Result;
-use std::fs::read_dir;
+use std::fs::{read_dir, Metadata};
 use std::io::Write;
 use std::path::PathBuf;
 use termcolor::{BufferWriter, Color, ColorChoice, ColorSpec, WriteColor};
+use std::os::unix::fs::MetadataExt;
+use users::{get_user_by_uid, get_group_by_gid};
 
 // prints all files in a single line
 pub fn print_hidden_files(path_list: Vec<PathBuf>) -> Result<()> {
@@ -140,16 +142,46 @@ fn get_attributes(file: &PathBuf) -> String {
     // attempts to get metadata if possible
     match file.metadata() {
         // added spacing to the list print for readability
-        Ok(meta) => format!(
-            "{}{:>3}{:>7},{}",
+        Ok(meta) => {
+            let user_data = get_user_metadata(&meta);
+
+            format!(
+            "{}{:>3} {:>5} {:>5}{:>7},{}",
             file_or_dir,
             number_files,
+            user_data.user_name, // to be user id
+            user_data.group_name, // to be group id
             meta.len() / convert_kb,
             "KB"
-        ),
+        )},
         Err(_e) => format!("{}", file_or_dir),
     }
 
     // d            subdirs   owner        group         size  date_modded
     // drwxr-xr-x.  2         layonthehorn layonthehorn  4096  Jul 19 13:13
+}
+
+
+struct UserData{
+    user_name: String,
+    group_name: String
+}
+
+fn get_user_metadata(meta: &Metadata) -> UserData {
+    let user_id = get_user_by_uid(meta.uid());
+    let group_id = get_group_by_gid(meta.gid());
+    let user = match &user_id {
+        Some(u) =>{u.name().to_str().unwrap_or_else(|| {"DNE"})}
+        None => {"DNE"}
+    };
+    let group = match &group_id {
+        Some(g)=> { g.name().to_str().unwrap_or_else(||{"DNE"})
+
+        },
+        None => {"DNE"}
+    };
+    UserData{
+        user_name: user.to_string(),
+        group_name: group.to_string(),
+    }
 }
