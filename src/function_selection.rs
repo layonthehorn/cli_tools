@@ -20,11 +20,13 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
         match flags.get_options() {
             // lists all files
             (true, true) => {
-                print_functions::list_hidden_files(path_vec).context("Failed to print results.")?;
+                print_functions::list_hidden_files(path_vec)
+                    .context("Failed to print results.")?;
             }
             // only lists nonhidden files
             (true, false) => {
-                print_functions::list_normal_files(path_vec).context("Failed to print results.")?;
+                print_functions::list_normal_files(path_vec)
+                    .context("Failed to print results.")?;
             }
             // shows all files in nonlist format
             (false, true) => {

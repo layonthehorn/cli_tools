@@ -8,6 +8,8 @@ use termcolor::{BufferWriter, Color, ColorChoice, ColorSpec, WriteColor};
 pub fn print_hidden_files(path_list: Vec<PathBuf>) -> Result<()> {
     let bufwtr = BufferWriter::stdout(ColorChoice::Always);
     let mut buffer = bufwtr.buffer();
+
+    // printing loop
     for path in path_list.iter() {
         let base_name = get_file_base_name(&path);
         if path.is_dir() {
@@ -28,6 +30,8 @@ pub fn print_hidden_files(path_list: Vec<PathBuf>) -> Result<()> {
 pub fn print_normal_files(path_list: Vec<PathBuf>) -> Result<()> {
     let bufwtr = BufferWriter::stdout(ColorChoice::Always);
     let mut buffer = bufwtr.buffer();
+
+    // printing loop
     for path in path_list.iter() {
         let base_name = get_file_base_name(&path);
         if !base_name.starts_with('.') {
@@ -42,6 +46,7 @@ pub fn print_normal_files(path_list: Vec<PathBuf>) -> Result<()> {
     }
 
     writeln!(&mut buffer)?;
+    // final print
     bufwtr.print(&buffer)?;
     Ok(())
 }
@@ -67,6 +72,7 @@ pub fn list_normal_files(path_list: Vec<PathBuf>) -> Result<()> {
         }
     }
 
+    // final print
     bufwtr.print(&buffer)?;
     Ok(())
 }
@@ -75,6 +81,8 @@ pub fn list_normal_files(path_list: Vec<PathBuf>) -> Result<()> {
 pub fn list_hidden_files(path_list: Vec<PathBuf>) -> Result<()> {
     let bufwtr = BufferWriter::stdout(ColorChoice::Always);
     let mut buffer = bufwtr.buffer();
+
+    // printing loop
     for path in path_list.iter() {
         buffer.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
         let base_name = get_file_base_name(&path);
@@ -90,6 +98,7 @@ pub fn list_hidden_files(path_list: Vec<PathBuf>) -> Result<()> {
         }
     }
 
+    // final print
     bufwtr.print(&buffer)?;
     Ok(())
 }
