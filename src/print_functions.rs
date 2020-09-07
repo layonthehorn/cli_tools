@@ -1,15 +1,53 @@
 use std::path::PathBuf;
 use std::fs::read_dir;
+use std::io::{self, Write};
+use termcolor::{BufferWriter, Color, ColorChoice, ColorSpec, WriteColor};
 
 // prints all files in a single line
 pub fn print_hidden_files(path_list: Vec<PathBuf>) {
-    todo!()
+    let mut bufwtr = BufferWriter::stdout(ColorChoice::Always);
+    let mut buffer = bufwtr.buffer();
+    for path in path_list.iter(){
+        let base_name = get_file_base_name(&path);
+        if path.is_dir(){
+            buffer.set_color(ColorSpec::new().set_fg(Some(Color::Blue))).unwrap();
+            write!(&mut buffer,"{}", format!("{} ",base_name));
+
+        } else {
+            buffer.set_color(ColorSpec::new().set_fg(Some(Color::White))).unwrap();
+            write!(&mut buffer,"{}", format!("{} ",base_name));
+        }
+
+
+    }
+
+    write!(&mut buffer,"\n");
+    bufwtr.print(&buffer);
 
 }
 
-// prints visiable files in a list format
+// prints visible files in a list format
 pub fn print_normal_files(path_list: Vec<PathBuf>) {
-    todo!()
+    let mut bufwtr = BufferWriter::stdout(ColorChoice::Always);
+    let mut buffer = bufwtr.buffer();
+    for path in path_list.iter(){
+        let base_name = get_file_base_name(&path);
+        if !base_name.starts_with("."){
+            if path.is_dir(){
+                buffer.set_color(ColorSpec::new().set_fg(Some(Color::Blue))).unwrap();
+                write!(&mut buffer,"{}", format!("{} ",base_name));
+
+            } else {
+                buffer.set_color(ColorSpec::new().set_fg(Some(Color::White))).unwrap();
+                write!(&mut buffer,"{}", format!("{} ",base_name));
+            }
+        }
+
+
+    }
+
+    write!(&mut buffer,"\n");
+    bufwtr.print(&buffer);
 }
 
 // prints all files in a listing format
