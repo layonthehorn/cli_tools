@@ -44,30 +44,21 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
 
 // collects all the files in a given directory
 fn collect_dir_contents(path: &PathBuf) -> Vec<PathBuf> {
-    let mut path_list: Vec<PathBuf> = vec![path.join("..")];
+    let mut dir_list: Vec<PathBuf> = vec![path.join("..")];
+    let mut file_list: Vec<PathBuf> = Vec::new();
     for entry in read_dir(path).unwrap() {
         match entry {
             Ok(t) => {
-                path_list.push(t.path());
+                let inner_path = t.path();
+                if inner_path.is_dir() {
+                    dir_list.push(inner_path.clone());
+                } else {
+                    file_list.push(inner_path.clone());
+                }
             }
             Err(_e) => {}
         }
     }
-    sort_path_list(path_list)
-}
-
-// sorts the paths, files then directories
-fn sort_path_list(path_list: Vec<PathBuf>) -> Vec<PathBuf> {
-    let mut directories: Vec<PathBuf> = Vec::new();
-    let mut files: Vec<PathBuf> = Vec::new();
-    for path in path_list.iter() {
-        if path.is_dir() {
-            directories.push(path.clone());
-        } else {
-            files.push(path.clone());
-        }
-    }
-
-    files.append(&mut directories);
-    files
+    file_list.append(&mut dir_list);
+    file_list
 }
