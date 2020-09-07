@@ -48,16 +48,21 @@ fn get_attributes(file: &PathBuf) -> String {
     let convert_kb = 1000;
 
     // gets number of files inside directory
-    let number_files = match read_dir(file){
-        Ok(files) => {files.count().to_string()
-        }
-        Err(_e) => {"1".to_string()}
+    let number_files = match read_dir(file) {
+        Ok(files) => files.count().to_string(),
+        Err(_e) => "1".to_string(),
     };
     let file_or_dir = if file.is_dir() { 'D' } else { 'F' };
     // attempts to get metadata if possible
     match file.metadata() {
         // added spacing to the list print for readability
-        Ok(meta) => format!("{}{:>3}{:>7},{}", file_or_dir,number_files , meta.len()/convert_kb,"KB"),
+        Ok(meta) => format!(
+            "{}{:>3}{:>7},{}",
+            file_or_dir,
+            number_files,
+            meta.len() / convert_kb,
+            "KB"
+        ),
         Err(_e) => format!("{}", file_or_dir),
     }
 
@@ -89,16 +94,19 @@ fn create_pattern(path: &PathBuf) -> Result<String> {
 
 // ls -l
 fn list_normal_files(matcher: String) -> Result<()> {
-    for entry in glob_with(&matcher, MatchOptions{
-        case_sensitive: false,
-        require_literal_separator: false,
-        require_literal_leading_dot: true
-    }).context("Could not create glob iterator")? {
+    for entry in glob_with(
+        &matcher,
+        MatchOptions {
+            case_sensitive: false,
+            require_literal_separator: false,
+            require_literal_leading_dot: true,
+        },
+    )
+    .context("Could not create glob iterator")?
+    {
         match entry {
             Ok(path) => {
-                {
-                    println!("{} {}", get_attributes(&path), get_file_base_name(&path));
-                }
+                println!("{} {}", get_attributes(&path), get_file_base_name(&path));
             }
 
             Err(_e) => {}
@@ -140,11 +148,16 @@ fn list_hidden_files(matcher: String) -> Result<()> {
 // ls
 fn print_normal_files(matcher: String) -> Result<()> {
     let mut files = String::new();
-    for entry in glob_with(&matcher, MatchOptions{
-        case_sensitive: false,
-        require_literal_separator: false,
-        require_literal_leading_dot: true
-    }).context("Could not create glob iterator")? {
+    for entry in glob_with(
+        &matcher,
+        MatchOptions {
+            case_sensitive: false,
+            require_literal_separator: false,
+            require_literal_leading_dot: true,
+        },
+    )
+    .context("Could not create glob iterator")?
+    {
         match entry {
             Ok(path) => {
                 let file_name = get_file_base_name(&path);
