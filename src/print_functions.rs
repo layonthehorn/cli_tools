@@ -5,9 +5,7 @@ use std::path::PathBuf;
 use termcolor::{BufferWriter, Color, ColorChoice, ColorSpec, WriteColor};
 use std::os::unix::fs::MetadataExt;
 use users::{get_user_by_uid, get_group_by_gid};
-use std::env::join_paths;
-use std::time::SystemTime;
-use chrono::prelude::Datelike;
+use chrono::{TimeZone, Local};
 
 // prints all files in a single line
 pub fn print_hidden_files(path_list: Vec<PathBuf>) -> Result<()> {
@@ -165,6 +163,7 @@ fn get_attributes(file: &PathBuf) -> String {
 struct UserData{
     user_name: String,
     group_name: String,
+    // not yet used
     file_mode: String,
 }
 
@@ -223,10 +222,10 @@ fn get_user_metadata(meta: &Metadata) -> UserData {
 fn create_unix_file_mode(number: u32) -> String {
    number.to_string()
 }
-// todo: date of last change
-#[allow(dead_code, unused_variables)]
-fn get_last_change(meta: &Metadata) -> String{
-    let last_time = meta.mtime();
 
-    last_time.to_string()
+// gets last time of modification
+fn get_last_change(meta: &Metadata) -> String{
+    let dt = Local.timestamp(meta.mtime(), 0);
+
+    dt.to_rfc2822()
 }
