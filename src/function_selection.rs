@@ -53,5 +53,21 @@ fn collect_dir_contents(path: &PathBuf) -> Vec<PathBuf> {
             Err(_e) => {}
         }
     }
-    path_list
+    sort_path_list(path_list)
+}
+
+// sorts the paths, files then directories
+fn sort_path_list(path_list: Vec<PathBuf>) -> Vec<PathBuf> {
+    let mut directories: Vec<PathBuf> = Vec::new();
+    let mut files: Vec<PathBuf> = Vec::new();
+    for path in path_list.iter() {
+        if path.is_dir() {
+            directories.push(path.clone());
+        } else {
+            files.push(path.clone());
+        }
+    }
+
+    files.append(&mut directories);
+    files
 }

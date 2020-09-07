@@ -145,7 +145,7 @@ fn get_attributes(file: &PathBuf) -> String {
                 file_or_dir,
                 user_data.file_mode,
                 // returns ? if unable to look into directory
-                get_subdirectory_count(&file).unwrap_or_else(|_| {"?".to_string()}),
+                get_subdirectory_count(&file).unwrap_or_else(|_| { "?".to_string() }),
                 user_data.user_name,  // to be user id
                 user_data.group_name, // to be group id
                 meta.len() / convert_kb,
@@ -174,7 +174,7 @@ fn get_subdirectory_count(path: &PathBuf) -> Result<String> {
     // if its a directory return the count of directories inside it
     let count = if path.is_dir() {
         let mut inner_count = 2;
-        for entry in read_dir(path)?{
+        for entry in read_dir(path)? {
             match entry {
                 Ok(t) => {
                     if t.path().is_dir() {
@@ -223,7 +223,7 @@ fn create_unix_file_mode(number: u32) -> String {
     // getting permissions slice
     base_8_mode = base_8_mode[start..end].to_string();
     let mut print_value = String::new();
-    for number in base_8_mode.chars(){
+    for number in base_8_mode.chars() {
         match number {
             '0' => &print_value.push_str("---"),
             '1' => &print_value.push_str("--x"),
@@ -236,9 +236,8 @@ fn create_unix_file_mode(number: u32) -> String {
             // should never happen but I want to know if it does.
             _ => unreachable!(),
         };
-    };
+    }
     print_value
-
 }
 
 // gets last time of modification

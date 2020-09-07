@@ -35,9 +35,8 @@ pub fn get_directory(cli_result: &ArgMatches) -> Result<PathBuf> {
             let mut temp = PathBuf::new();
             temp.push(path);
             temp
-        },
-        None => std::env::current_dir().context("Could not open current directory.")?
-
+        }
+        None => std::env::current_dir().context("Could not open current directory.")?,
     };
     Ok(directory)
 }
