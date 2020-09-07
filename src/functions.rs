@@ -9,14 +9,12 @@ use std::fs::read_dir;
 pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
     // checks to see if file can be open and if not terminates the program with error message
     std::fs::File::open(path).context(format!("Could not open {} for reading.", path.display()))?;
-    let base_name = get_file_base_name(&path);
 
     if path.is_file() {
         if flags.list_files() {
-            let attributes = get_attributes(&path);
-            println!("{} {}", attributes, base_name);
+            print_functions::list_single_file(&path);
         } else {
-            println!("{}", base_name)
+            print_functions::print_single_file(&path);
         }
     } else {
         let path_vec = collect_dir_contents(&path);
@@ -24,19 +22,22 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
         match flags.get_options() {
             // lists all files
             (true, true) => {
-                list_hidden_files(pattern)?;
+                print_functions::list_hidden_files(path_vec);
+                //list_hidden_files(pattern)?;
             }
             // only lists nonhidden files
             (true, false) => {
-                list_normal_files(pattern)?;
+                print_functions::list_normal_files(path_vec);
+                //list_normal_files(pattern)?;
             }
             // shows all files in nonlist format
             (false, true) => {
-                print_hidden_files(pattern)?;
+                print_functions::print_hidden_files(path_vec);
+                //print_hidden_files(pattern)?;
             }
             // shows nonhidden files in nonlist format
             (false, false) => {
-                collect_dir_contents(&path);
+                print_functions::print_normal_files(path_vec);
                 //print_normal_files(pattern)?;
             }
         }

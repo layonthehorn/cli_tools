@@ -3,32 +3,33 @@ use std::fs::read_dir;
 
 // prints all files in a single line
 pub fn print_hidden_files(path_list: Vec<PathBuf>) {
+    todo!()
 
 }
 
 // prints visiable files in a list format
 pub fn print_normal_files(path_list: Vec<PathBuf>) {
-
+    todo!()
 }
 
 // prints all files in a listing format
 pub fn list_normal_files(path_list: Vec<PathBuf>) {
-
+    todo!()
 }
 
 // prints visible files in a list format
 pub fn list_hidden_files(path_list: Vec<PathBuf>) {
-
+    todo!()
 }
 
 // prints the information about a single file
 pub fn print_single_file(path:&PathBuf) {
-
+    println!("{}",get_file_base_name(&path));
 }
 
 // lists the information about a single file
 pub fn list_single_file(path: &PathBuf) {
-
+    println!("{} {}",get_attributes(&path) , get_file_base_name(&path));
 }
 
 // gets the base name of the file at the end of a path
