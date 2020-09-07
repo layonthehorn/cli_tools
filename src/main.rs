@@ -1,5 +1,5 @@
 mod cli_interface;
-mod functions;
+mod function_selection;
 mod print_functions;
 
 use anyhow::Result;
@@ -12,7 +12,7 @@ fn main() -> Result<()> {
     // a struct of the options selected at run time
     let flags = cli_interface::get_options(&cli);
 
-    functions::list_files(&path, &flags)?;
+    function_selection::list_files(&path, &flags)?;
 
     Ok(())
 }

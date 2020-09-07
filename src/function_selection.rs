@@ -46,12 +46,11 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
 
 // collects all the files in a given directory
 fn collect_dir_contents(path: &PathBuf) -> Vec<PathBuf>{
-    let mut path_list: Vec<PathBuf> = vec![path.join(".."), path.join(".")];
+    let mut path_list: Vec<PathBuf> = vec![path.join("..")];
     for entry in read_dir(path).unwrap(){
         match entry{
             Ok(t) =>{
                 path_list.push(t.path());
-                //println!("{}", T.path().display());
             },
             Err(_e) => {}
         }
@@ -60,15 +59,6 @@ fn collect_dir_contents(path: &PathBuf) -> Vec<PathBuf>{
     path_list
 }
 /*
-// creates the glob pattern
-fn create_pattern(path: &PathBuf) -> Result<String> {
-    let match_string = path.join("*");
-    let return_string = match_string
-        .to_str()
-        .context("Could not convert path to usable expression.")?;
-    Ok(return_string.to_string())
-}
-
 // ls -l
 fn list_normal_files(matcher: String) -> Result<()> {
     for entry in glob_with(
@@ -92,22 +82,6 @@ fn list_normal_files(matcher: String) -> Result<()> {
     Ok(())
 }
 
-// ls -a
-fn print_hidden_files(matcher: String) -> Result<()> {
-    let mut files = String::new();
-    for entry in glob(&matcher).context("Could not create glob iterator")? {
-        match entry {
-            Ok(path) => {
-                let file_name = get_file_base_name(&path);
-                files.push_str(" ");
-                files.push_str(&file_name);
-            }
-            Err(_e) => {}
-        }
-    }
-    println!("{}", files.trim());
-    Ok(())
-}
 
 // ls -al
 fn list_hidden_files(matcher: String) -> Result<()> {
@@ -122,29 +96,4 @@ fn list_hidden_files(matcher: String) -> Result<()> {
     Ok(())
 }
 
-// ls
-fn print_normal_files(matcher: String) -> Result<()> {
-    let mut files = String::new();
-    for entry in glob_with(
-        &matcher,
-        MatchOptions {
-            case_sensitive: false,
-            require_literal_separator: false,
-            require_literal_leading_dot: true,
-        },
-    )
-    .context("Could not create glob iterator")?
-    {
-        match entry {
-            Ok(path) => {
-                let file_name = get_file_base_name(&path);
-                files.push_str(" ");
-                files.push_str(&file_name);
-            }
-            Err(_e) => {}
-        }
-    }
-    println!("{}", files.trim());
-    Ok(())
-}
 */
