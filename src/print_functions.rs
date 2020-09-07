@@ -140,9 +140,9 @@ fn get_attributes(file: &PathBuf) -> String {
             let user_data = get_user_metadata(&meta);
 
             format!(
-            "{}{}{:>3} {:>5} {:>5}{:>7},{}",
+            "{}{:>3} {:>5} {:>5}{:>7},{}",
             file_or_dir,
-            user_data.file_mode,
+            //user_data.file_mode,
             get_subdirectory_count(&file),
             user_data.user_name, // to be user id
             user_data.group_name, // to be group id
@@ -156,7 +156,8 @@ fn get_attributes(file: &PathBuf) -> String {
     // drwxr-xr-x.  2         layonthehorn layonthehorn  4096  Jul 19 13:13
 }
 
-
+// will hold useful user and file data
+#[allow(dead_code)]
 struct UserData{
     user_name: String,
     group_name: String,
@@ -214,6 +215,7 @@ fn get_user_metadata(meta: &Metadata) -> UserData {
     }
 }
 
+// todo: Creation of decent permissions printing
 fn create_unix_file_mode(number: u32) -> String {
    number.to_string()
 }
