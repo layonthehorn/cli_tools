@@ -19,7 +19,12 @@ pub fn print_hidden_files(path_list: Vec<PathBuf>) -> Result<()> {
             buffer.set_color(ColorSpec::new().set_fg(Some(Color::Blue)))?;
             write!(&mut buffer, "{}", format!("{} ", base_name))?;
         } else {
-            buffer.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
+            // if the file is executable it colors it green
+            if is_executable(&path){
+                buffer.set_color(ColorSpec::new().set_fg(Some(Color::Green)))?;
+            }else {
+                buffer.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
+            }
             write!(&mut buffer, "{}", format!("{} ", base_name))?;
         }
     }
@@ -42,7 +47,12 @@ pub fn print_normal_files(path_list: Vec<PathBuf>) -> Result<()> {
                 buffer.set_color(ColorSpec::new().set_fg(Some(Color::Blue)))?;
                 write!(&mut buffer, "{}", format!("{} ", base_name))?;
             } else {
-                buffer.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
+                // if the file is executable it colors it green
+                if is_executable(&path){
+                    buffer.set_color(ColorSpec::new().set_fg(Some(Color::Green)))?;
+                }else {
+                    buffer.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
+                }
                 write!(&mut buffer, "{}", format!("{} ", base_name))?;
             }
         }
@@ -68,7 +78,12 @@ pub fn list_normal_files(path_list: Vec<PathBuf>) -> Result<()> {
                 write!(&mut buffer, "{}", format!("{} ", base_name))?;
                 writeln!(&mut buffer)?;
             } else {
-                buffer.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
+                // if the file is executable it colors it green
+                if is_executable(&path){
+                    buffer.set_color(ColorSpec::new().set_fg(Some(Color::Green)))?;
+                }else {
+                    buffer.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
+                }
                 write!(&mut buffer, "{}", format!("{} ", base_name))?;
                 writeln!(&mut buffer)?;
             }
@@ -95,7 +110,12 @@ pub fn list_hidden_files(path_list: Vec<PathBuf>) -> Result<()> {
             write!(&mut buffer, "{}", format!("{} ", base_name))?;
             writeln!(&mut buffer)?;
         } else {
-            buffer.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
+            // if the file is executable it colors it green
+            if is_executable(&path){
+                buffer.set_color(ColorSpec::new().set_fg(Some(Color::Green)))?;
+            }else {
+                buffer.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
+            }
             write!(&mut buffer, "{}", format!("{} ", base_name))?;
             writeln!(&mut buffer)?;
         }
@@ -161,11 +181,9 @@ fn get_attributes(file: &PathBuf) -> String {
 }
 
 // will hold useful user and file data
-#[allow(dead_code)]
 struct UserData {
     user_name: String,
     group_name: String,
-    // not yet used
     file_mode: String,
 }
 
@@ -238,6 +256,27 @@ fn create_unix_file_mode(number: u32) -> String {
         };
     }
     print_value
+}
+
+// checks if the first bit is a 7
+fn is_executable(file: &PathBuf) -> bool {
+     match file.metadata() {
+         Ok(meta) => {
+             let permissions = format!("{:o}",meta.mode());
+             let first_bit = permissions.chars()
+                 .nth(permissions.len()-3)
+                 .unwrap_or_else(|| {'0'});
+             match first_bit {
+                 '7' => true,
+                 '1' => true,
+                 '3' => true,
+                 '5' => true,
+                 _ => false
+             }
+         }
+         Err(_e) => false
+
+    }
 }
 
 // gets last time of modification
