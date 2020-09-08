@@ -7,10 +7,18 @@ use anyhow::Result;
 fn main() -> Result<()> {
     // getting the input from the cli
     let cli = cli_interface::get_arguments();
-    // gets the directory to scan, fails if cannot read it.
-    let path = cli_interface::get_directory(&cli)?;
     // a struct of the options selected at run time
     let flags = cli_interface::get_options(&cli);
+    // gets the directory to scan, fails if cannot read it.
+    let path;
+    if flags.is_rec(){
+        // recursively lists files
+        path = cli_interface::get_directory(&cli)?
+    } else {
+        // lists a single level
+        path = cli_interface::get_directory(&cli)?
+    }
+
 
     function_selection::list_files(&path, &flags)?;
 
