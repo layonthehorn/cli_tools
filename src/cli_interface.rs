@@ -24,7 +24,7 @@ pub fn get_arguments() -> ArgMatches<'static> {
             Arg::with_name("Recursive")
                 .short("r")
                 .long("recursive")
-                .help("Searches through all subdirectories")
+                .help("Searches through all subdirectories"),
         )
         // optional directory to scan
         .arg(
@@ -38,7 +38,6 @@ pub fn get_arguments() -> ArgMatches<'static> {
 pub fn get_directory(cli_result: &ArgMatches) -> Result<PathBuf> {
     let directory = match cli_result.value_of("Directory") {
         Some(path) => {
-
             let mut temp = PathBuf::new();
             temp.push(path);
             temp
@@ -52,7 +51,7 @@ pub fn get_options(cli_result: &ArgMatches) -> Options {
     Options::new(
         cli_result.is_present("List"),
         cli_result.is_present("Hidden"),
-        cli_result.is_present("Recursive")
+        cli_result.is_present("Recursive"),
     )
 }
 
@@ -67,11 +66,13 @@ impl Options {
         Options {
             list: op_list,
             all: op_all,
-            rec: op_rec
+            rec: op_rec,
         }
     }
 
-    pub fn is_rec(&self) -> bool {self.rec}
+    pub fn is_rec(&self) -> bool {
+        self.rec
+    }
 
     pub fn get_options(&self) -> (bool, bool) {
         (self.list, self.all)

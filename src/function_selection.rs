@@ -21,7 +21,7 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
         if flags.is_rec() {
             path_vec = collect_dir_contents_recursively(&path);
         } else {
-           path_vec = collect_dir_contents(&path);
+            path_vec = collect_dir_contents(&path);
         }
         match flags.get_options() {
             // lists all files
@@ -49,13 +49,12 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
 }
 
 fn collect_dir_contents_recursively(path: &PathBuf) -> Vec<PathBuf> {
-
     let mut dir_list: Vec<PathBuf> = Vec::new();
     let mut file_list: Vec<PathBuf> = Vec::new();
 
     for entry in WalkDir::new(path).into_iter().filter_map(|e| e.ok()) {
         let dir_path = entry.path();
-        if dir_path.is_dir(){
+        if dir_path.is_dir() {
             dir_list.push(PathBuf::from(dir_path));
         } else {
             file_list.push(PathBuf::from(dir_path));

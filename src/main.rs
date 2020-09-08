@@ -12,7 +12,6 @@ fn main() -> Result<()> {
     // gets the directory to scan, fails if cannot read it.
     let path = cli_interface::get_directory(&cli)?;
 
-
     function_selection::list_files(&path, &flags)?;
 
     Ok(())
