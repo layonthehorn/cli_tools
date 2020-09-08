@@ -16,7 +16,13 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
             print_functions::print_single_file(&path);
         }
     } else {
-        let path_vec = collect_dir_contents(&path);
+        let path_vec;
+        if flags.is_rec() {
+            todo!();
+            path_vec = Vec::new();
+        } else {
+           path_vec = collect_dir_contents(&path);
+        }
         match flags.get_options() {
             // lists all files
             (true, true) => {

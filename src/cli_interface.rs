@@ -48,10 +48,6 @@ pub fn get_directory(cli_result: &ArgMatches) -> Result<PathBuf> {
     Ok(directory)
 }
 
-pub fn get_directory_recursive(cli_result: &ArgMatches) -> Result<PathBuf> {
-
-}
-
 pub fn get_options(cli_result: &ArgMatches) -> Options {
     Options::new(
         cli_result.is_present("List"),
