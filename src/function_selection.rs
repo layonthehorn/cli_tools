@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use crate::cli_interface::Options;
 use crate::print_functions;
 use std::fs::read_dir;
+use walkdir::WalkDir;
 
 pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
     // checks to see if file can be open and if not terminates the program with error message
@@ -18,8 +19,7 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
     } else {
         let path_vec;
         if flags.is_rec() {
-            todo!();
-            path_vec = Vec::new();
+            path_vec = collect_dir_contents_recursively(&path);
         } else {
            path_vec = collect_dir_contents(&path);
         }
@@ -46,6 +46,23 @@ pub fn list_files(path: &PathBuf, flags: &Options) -> Result<()> {
     }
 
     Ok(())
+}
+
+fn collect_dir_contents_recursively(path: &PathBuf) -> Vec<PathBuf> {
+
+    let mut dir_list: Vec<PathBuf> = Vec::new();
+    let mut file_list: Vec<PathBuf> = Vec::new();
+
+    for entry in WalkDir::new(path).into_iter().filter_map(|e| e.ok()) {
+        let dir_path = entry.path();
+        if dir_path.is_dir(){
+            dir_list.push(PathBuf::from(dir_path));
+        } else {
+            file_list.push(PathBuf::from(dir_path));
+        }
+    }
+    file_list.append(&mut dir_list);
+    file_list
 }
 
 // collects all the files in a given directory
